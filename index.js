@@ -11,17 +11,21 @@ app.get('/jokes', async (req, res, next) => {
     // TODO - filter the jokes by tags and content
     let jokes = [];
     
-    if (req.query.tags){
+    if (req.query){
       jokes = await Joke.findAll({where: {
         tags:{
-          [Op.substring]: req.query.tags
-        }}
-      })
-    }else if(req.query.content){
-      jokes = await Joke.findAll({where: {
+          [Op.substring]: req.query.tags??""
+        },
         joke: {
-          [Op.substring]: req.query.content
-        }}})
+                [Op.substring]: req.query.content??""
+              }
+      }
+      })
+    // }else if(req.query.content){
+    //   jokes = await Joke.findAll({where: {
+    //     joke: {
+    //       [Op.substring]: req.query.content
+    //     }}})
     }else{
     jokes = await Joke.findAll()
   }
@@ -32,6 +36,15 @@ app.get('/jokes', async (req, res, next) => {
     next(error)
   }
 });
+
+app.post("/jokes", async(req,res,next)=>{
+  try{
+    const joke = await Joke.create(req.body)
+    res.status(201).send(joke)
+  }catch(error){
+    next(error)
+  }
+})
 
 // we export the app, not listening in here, so that we can run tests
 module.exports = app;
